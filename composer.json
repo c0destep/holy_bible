@@ -1,0 +1,48 @@
+{
+    "name": "codestep/holy_bible",
+    "description": "Holy Bible",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Codestep\\HolyBible\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Lucas Alves",
+            "email": "codestep@codingstep.com.br",
+            "homepage": "https://www.codingstep.com.br",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "phpstan/phpstan": "^1.8",
+        "nunomaduro/phpinsights": "^2.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "phpunit": [
+            "./vendor/bin/phpunit"
+        ],
+        "cs": [
+            "./vendor/bin/php-cs-fixer fix --allow-risky yes"
+        ],
+        "phpstan": [
+            "./vendor/bin/phpstan analyse src tests --level 7"
+        ],
+        "phpinsights": [
+            "./vendor/bin/phpinsights"
+        ]
+    }
+}
