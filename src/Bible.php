@@ -70,11 +70,11 @@ class Bible
 
         $response = curl_exec($ch);
 
-        if ($response === false) {
+        curl_close($ch);
+
+        if (is_bool($response) && $response === false) {
             throw new Exception(curl_error($ch));
         }
-
-        curl_close($ch);
 
         $decode = json_decode($response, true);
 
