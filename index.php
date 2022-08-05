@@ -9,7 +9,7 @@ use Codestep\HolyBible\Bible;
 $bible = Bible::getInstance();
 
 try {
-    print_r($bible->getVerse());
+    print_r($bible->getChapter());
 } catch (Exception $e) {
     die($e->getMessage());
 }
