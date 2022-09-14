@@ -30,14 +30,61 @@ class Bible
         $this->userToken = $userToken;
 
         if ($this->useCache === true) {
+            if (empty($this->books)) {
+                $this->getBooksSaved();
+            }
+        } else {
             if (empty($this->versions)) {
                 $this->getVersionsApi();
             }
+
             if (empty($this->books)) {
                 $this->getBooksApi();
-                $this->getBooksSaved();
             }
         }
+    }
+
+    private function getBooksSaved(): void
+    {
+        if ($this->hasDirectoryStorage() && $this->hasDirectoryBooks()) {
+            $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->pathBooks, FilesystemIterator::SKIP_DOTS));
+
+            foreach ($directoryIterator as $filePath => $file) {
+                if ((pathinfo($filePath)['extension'] === 'json') && !is_null(Books::tryFrom(pathinfo($filePath)['filename']))) {
+                    $this->books[pathinfo($filePath)['filename']] = json_decode(file_get_contents($filePath), true);
+                }
+            }
+        }
+    }
+
+    private function hasDirectoryStorage(): bool
+    {
+        $directoryIterator = new FilesystemIterator($this->pathRoot, FilesystemIterator::SKIP_DOTS);
+
+        if ($directoryIterator->valid()) {
+            foreach ($directoryIterator as $fileInfo) {
+                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'storage' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function hasDirectoryBooks(): bool
+    {
+        $directoryIterator = new FilesystemIterator($this->pathRoot . '/storage', FilesystemIterator::SKIP_DOTS);
+
+        if ($directoryIterator->valid()) {
+            foreach ($directoryIterator as $fileInfo) {
+                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'books' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function getVersionsApi(): void
@@ -110,49 +157,6 @@ class Bible
         }
     }
 
-    private function getBooksSaved(): void
-    {
-        if ($this->hasDirectoryStorage() && $this->hasDirectoryBooks()) {
-            $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->pathBooks, FilesystemIterator::SKIP_DOTS));
-
-            foreach ($directoryIterator as $filePath => $file) {
-                if ((pathinfo($filePath)['extension'] === 'json') && !is_null(Books::tryFrom(pathinfo($filePath)['filename']))) {
-                    $this->books[pathinfo($filePath)['filename']] = json_decode(file_get_contents($filePath), true);
-                }
-            }
-        }
-    }
-
-    private function hasDirectoryStorage(): bool
-    {
-        $directoryIterator = new FilesystemIterator($this->pathRoot, FilesystemIterator::SKIP_DOTS);
-
-        if ($directoryIterator->valid()) {
-            foreach ($directoryIterator as $fileInfo) {
-                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'storage' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private function hasDirectoryBooks(): bool
-    {
-        $directoryIterator = new FilesystemIterator($this->pathRoot . '/storage', FilesystemIterator::SKIP_DOTS);
-
-        if ($directoryIterator->valid()) {
-            foreach ($directoryIterator as $fileInfo) {
-                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'books' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public static function getInstance(string $version = 'nvi', bool $useCache = true, string $userToken = null): Bible
     {
         if (!isset(self::$instance)) {
@@ -171,12 +175,12 @@ class Bible
         }
 
         foreach ($this->books as $index => $fBook) {
-            if ($index === $book->value) {
+            if (($index === $book->value) && isset($fBook[$chapter - 1])) {
                 return $fBook[$chapter - 1];
             }
         }
 
-        return [];
+        return ['error' => 'Chapter not found'];
     }
 
     /**
@@ -257,12 +261,12 @@ class Bible
         }
 
         foreach ($this->books as $index => $fBook) {
-            if ($index === $book->value) {
+            if (($index === $book->value) && isset($fBook[$chapter - 1], $fBook[$chapter - 1]['verses'][$verse - 1])) {
                 return $fBook[$chapter - 1]['verses'][$verse - 1];
             }
         }
 
-        return [];
+        return ['error' => 'Verse not found'];
     }
 
     public function __clone()
