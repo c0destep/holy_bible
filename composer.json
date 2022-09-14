@@ -37,7 +37,7 @@
             "./vendor/bin/phpunit"
         ],
         "cs": [
-            "./vendor/bin/php-cs-fixer fix --allow-risky yes"
+            "./vendor/bin/php-cs-fixer fix src --allow-risky yes"
         ],
         "phpstan": [
             "./vendor/bin/phpstan analyse src tests --level 7"
