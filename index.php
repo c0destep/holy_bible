@@ -10,7 +10,7 @@ use Codestep\HolyBible\Books;
 $bible = Bible::getInstance();
 
 try {
-    print_r($bible->getVerse(Books::GENESIS, 1, 5));
+    print_r($bible->getChapter(Books::FIRST_CORINTHIANS, 2));
 } catch (Exception $e) {
     die($e->getMessage());
 }
