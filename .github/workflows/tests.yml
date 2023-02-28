@@ -36,7 +36,7 @@ jobs:
                 run: composer normalize --dry-run --indent-size=4 --indent-style=space
 
             -   name: Run PHP-CS-Fixer
-                run: ./vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose
+                run: ./vendor/bin/php-cs-fixer fix src --show-progress=dots --using-cache=no --verbose
 
             -   name: Run PHPStan
                 run: ./vendor/bin/phpstan analyse src tests
