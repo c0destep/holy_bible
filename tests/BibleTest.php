@@ -1,48 +1,19 @@
 <?php
 
+namespace Tests;
 
+use HolyBible\Bible;
 use PHPUnit\Framework\TestCase;
 
 class BibleTest extends TestCase
 {
-
-    public function testGetVersions()
+    public function testGetBooks(): void
     {
+        $bible = new Bible();
+        $books = $bible->getBooks();
 
-    }
+        $this->assertIsArray($books, 'Error return not array');
 
-    public function testGetChapter()
-    {
-
-    }
-
-    public function testSetUserToken()
-    {
-
-    }
-
-    public function testGetUserToken()
-    {
-
-    }
-
-    public function testGetVerse()
-    {
-
-    }
-
-    public function testSetVersion()
-    {
-
-    }
-
-    public function testGetBooks()
-    {
-
-    }
-
-    public function testGetVersion()
-    {
-
+        $this->assertArrayHasKey('error', $books, $books['error']);
     }
 }
