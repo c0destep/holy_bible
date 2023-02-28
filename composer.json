@@ -50,7 +50,7 @@
     },
     "scripts": {
         "post-autoload-dump": "./vendor/bin/captainhook install -f -s",
-        "phpcsfixer": "./vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose",
+        "phpcsfixer": "./vendor/bin/php-cs-fixer fix src --show-progress=dots --using-cache=no --verbose",
         "phpstan": "./vendor/bin/phpstan analyse src tests --xdebug",
         "phpunit": "./vendor/bin/phpunit --verbose"
     }
