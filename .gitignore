@@ -1,12 +1,20 @@
 ### Composer template
 composer.phar
+composer.lock
 /vendor/
 
-# Php cs fixer
-.php-cs-fixer.cache
-
-# IntelliJ project files
+### IntelliJ Project Files
 .idea
 *.iml
 out
 gen
+
+### VSCode Project Files
+.vscode
+
+### PHPUnit Files
+.phpunit.result.cache
+phpunit.xml
+
+### PHP CS Fixer Files
+.php-cs-fixer.cache

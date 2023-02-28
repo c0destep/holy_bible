@@ -1,0 +1,71 @@
+{
+    "prepare-commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\Ramsey\\CaptainHook\\PrepareConventionalCommit"
+            }
+        ]
+    },
+    "commit-msg": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\Ramsey\\CaptainHook\\ValidateConventionalCommit"
+            }
+        ]
+    },
+    "pre-commit": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "\\CaptainHook\\App\\Hook\\PHP\\Action\\Linting",
+                "options": [],
+                "conditions": []
+            },
+            {
+                "action": "composer normalize --dry-run --indent-size=4 --indent-style=space",
+                "options": [],
+                "conditions": []
+            },
+            {
+                "action": "./vendor/bin/phpstan analyse src tests",
+                "options": [],
+                "conditions": []
+            },
+            {
+                "action": "./vendor/bin/phpunit --verbose",
+                "options": [],
+                "conditions": []
+            }
+        ]
+    },
+    "pre-push": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-commit": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-merge": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-checkout": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-rewrite": {
+        "enabled": false,
+        "actions": []
+    },
+    "post-change": {
+        "enabled": true,
+        "actions": [
+            {
+                "action": "echo 'PHP'"
+            }
+        ]
+    }
+}

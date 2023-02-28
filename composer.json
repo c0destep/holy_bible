@@ -1,52 +1,57 @@
 {
-    "name": "codestep/holy_bible",
+    "name": "c0destep/holy_bible",
     "description": "Holy Bible",
-    "type": "library",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Codestep\\HolyBible\\": "src/"
-        }
-    },
+    "type": "library",
     "authors": [
         {
             "name": "Lucas Alves",
-            "email": "codestep@codingstep.com.br",
-            "homepage": "https://www.codingstep.com.br",
+            "email": "lucas.alves.capristrano59@gmail.com",
             "role": "Developer"
         }
     ],
-    "minimum-stability": "stable",
+    "support": {
+        "issues": "https://github.com/c0destep/holy_bible/issues",
+        "source": "https://github.com/c0destep/holy_bible"
+    },
     "require": {
         "php": "^8.1",
-        "ext-curl": "*"
+        "guzzlehttp/guzzle": "^7"
     },
     "require-dev": {
+        "captainhook/captainhook": "^5",
+        "captainhook/plugin-composer": "^5",
+        "ergebnis/composer-normalize": "^2",
+        "friendsofphp/php-cs-fixer": "^3",
+        "phpstan/phpstan": "^1",
         "phpunit/phpunit": "^9",
-        "phpstan/phpstan": "^1.8",
-        "nunomaduro/phpinsights": "^2.4",
-        "friendsofphp/php-cs-fixer": "^3"
+        "ramsey/conventional-commits": "^1"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "HolyBible\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
     },
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        }
+            "ergebnis/composer-normalize": true,
+            "captainhook/plugin-composer": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     },
     "scripts": {
-        "phpunit": [
-            "./vendor/bin/phpunit"
-        ],
-        "cs": [
-            "./vendor/bin/php-cs-fixer fix src --allow-risky yes"
-        ],
-        "phpstan": [
-            "./vendor/bin/phpstan analyse src tests --level 7"
-        ],
-        "phpinsights": [
-            "./vendor/bin/phpinsights"
-        ],
-        "php-cs-fixer": [
-            "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src"
-        ]
+        "post-autoload-dump": "./vendor/bin/captainhook install -f -s",
+        "phpcsfixer": "./vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose",
+        "phpstan": "./vendor/bin/phpstan analyse src tests --xdebug",
+        "phpunit": "./vendor/bin/phpunit --verbose"
     }
 }

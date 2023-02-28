@@ -1,200 +1,91 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+namespace HolyBible;
 
-namespace Codestep\HolyBible;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
-use Exception;
-use FilesystemIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
+/**
+ * Bible
+ */
 class Bible
 {
-    private static Bible $instance;
-    protected string $pathRoot;
-    protected string $pathBooks;
-    protected bool $useCache;
-    protected array $books = [];
-    protected array $versions = [];
-    protected string $version;
-    private string $apiUrl = 'https://www.abibliadigital.com.br/api/';
+    /**
+     * API URL
+     */
+    private const API_URL = 'https://www.abibliadigital.com.br/api/';
+
+    /**
+     * @var string
+     */
+    private string $version;
+    /**
+     * @var string|null
+     */
     private ?string $userToken;
 
-    private function __construct(string $version = 'nvi', bool $useCache = true, string $userToken = null)
-    {
-        $this->pathRoot = dirname(__DIR__);
-        $this->pathBooks = $this->pathRoot . '/storage/books';
-        $this->version = $version;
-        $this->useCache = $useCache;
-        $this->userToken = $userToken;
-
-        if ($this->useCache === true) {
-            if (empty($this->books)) {
-                $this->getBooksSaved();
-            }
-        } else {
-            if (empty($this->versions)) {
-                $this->getVersionsApi();
-            }
-
-            if (empty($this->books)) {
-                $this->getBooksApi();
-            }
-        }
-    }
-
-    private function getBooksSaved(): void
-    {
-        if ($this->hasDirectoryStorage() && $this->hasDirectoryBooks()) {
-            $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->pathBooks, FilesystemIterator::SKIP_DOTS));
-
-            foreach ($directoryIterator as $filePath => $file) {
-                if ((pathinfo($filePath)['extension'] === 'json') && !is_null(Books::tryFrom(pathinfo($filePath)['filename']))) {
-                    $this->books[pathinfo($filePath)['filename']] = json_decode(file_get_contents($filePath), true);
-                }
-            }
-        }
-    }
-
-    private function hasDirectoryStorage(): bool
-    {
-        $directoryIterator = new FilesystemIterator($this->pathRoot, FilesystemIterator::SKIP_DOTS);
-
-        if ($directoryIterator->valid()) {
-            foreach ($directoryIterator as $fileInfo) {
-                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'storage' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private function hasDirectoryBooks(): bool
-    {
-        $directoryIterator = new FilesystemIterator($this->pathRoot . '/storage', FilesystemIterator::SKIP_DOTS);
-
-        if ($directoryIterator->valid()) {
-            foreach ($directoryIterator as $fileInfo) {
-                if ($fileInfo->isDir() && $fileInfo->getFilename() === 'books' && $fileInfo->isReadable() && $fileInfo->isWritable()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private function getVersionsApi(): void
-    {
-        try {
-            $this->versions = $this->getApi($this->apiUrl . 'versions');
-        } catch (Exception $e) {
-            die($e->getMessage());
-        }
-    }
-
     /**
-     * @throws Exception
+     * @param string $version Default NVI (Nova Versão Internacional)
+     * @param string|null $userToken
      */
-    private function getApi(string $url): array
+    public function __construct(string $version = 'nvi', string $userToken = null)
     {
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        if (!is_null($this->userToken)) {
-            $headers = [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                "Authorization: Bearer $this->userToken"
-            ];
-
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        }
-
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-
-        if (is_bool($response) && $response === false) {
-            throw new Exception(curl_error($ch));
-        }
-
-        $decode = json_decode($response, true);
-
-        if (is_null($decode)) {
-            throw new Exception('Error json decode');
-        }
-
-        return $decode;
-    }
-
-    private function getBooksApi(): void
-    {
-        try {
-            $books = $this->getApi($this->apiUrl . 'books');
-
-            foreach ($books as $book) {
-                $data = [];
-                $filename = Books::from($book['abbrev']['pt'])->value . '.json';
-
-                if (!file_exists($this->pathBooks . '/' . $filename)) {
-                    for ($i = 1; $i <= $book['chapters']; $i++) {
-                        $data[] = $this->getApi($this->apiUrl . 'verses/' . $this->version . '/' . Books::from($book['abbrev']['pt'])->value . '/' . $i);
-                    }
-
-                    $file = fopen($this->pathBooks . '/' . $filename, 'w');
-
-                    fwrite($file, json_encode($data));
-                    fclose($file);
-                }
-            }
-        } catch (Exception $e) {
-            die($e->getMessage());
-        }
-    }
-
-    public static function getInstance(string $version = 'nvi', bool $useCache = true, string $userToken = null): Bible
-    {
-        if (!isset(self::$instance)) {
-            self::$instance = new self($version, $useCache, $userToken);
-        }
-        return self::$instance;
+        $this->version = $version;
+        $this->userToken = $userToken;
     }
 
     /**
-     * @throws Exception
+     * @param Books $book
+     * @param int $chapter
+     * @return string[]
      */
     public function getChapter(Books $book = Books::GENESIS, int $chapter = 1): array
     {
-        if (!$this->useCache) {
-            return $this->getApi($this->apiUrl . 'verses/' . $this->version . '/' . $book->value . '/' . $chapter);
-        }
-
-        foreach ($this->books as $index => $fBook) {
-            if (($index === $book->value) && isset($fBook[$chapter - 1])) {
-                return $fBook[$chapter - 1];
-            }
-        }
-
-        return ['error' => 'Chapter not found'];
+        return $this->getContentApi('verses/' . $this->version . DIRECTORY_SEPARATOR . $book->value . DIRECTORY_SEPARATOR . $chapter);
     }
 
     /**
-     * @return string
+     * @param string $uri
+     * @return string[]
      */
-    public function getApiUrl(): string
+    public function getContentApi(string $uri): array
     {
-        return $this->apiUrl;
+        try {
+            $client = new Client([
+                'base_url' => self::API_URL,
+                'timeout' => 2.0
+            ]);
+
+            if (!is_null($this->userToken)) {
+                $response = $client->get($uri, [
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . $this->userToken
+                    ]
+                ]);
+            } else {
+                $response = $client->get($uri);
+            }
+
+            if ($response->getStatusCode() !== 200) {
+                return [
+                    'error' => $response->getBody()->getContents()
+                ];
+            }
+
+            return json_decode($response->getBody()->getContents(), true) ?? ['error' => 'json decode fail'];
+        } catch (GuzzleException $guzzleException) {
+            return [
+                'error' => $guzzleException->getMessage()
+            ];
+        }
     }
 
     /**
      * @return string
      */
-    public function getVersion(): string
+    public function getCurrentVersion(): string
     {
         return $this->version;
     }
@@ -228,52 +119,29 @@ class Bible
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getBooks(): array
     {
-        if (empty($this->books)) {
-            $this->getBooksApi();
-            return $this->books;
-        }
-        return $this->books;
+        return $this->getContentApi('books');
     }
 
     /**
-     * @return array
+     * @return string[]
      */
-    public function getVersions(): array
+    public function getAvailableVersions(): array
     {
-        if (empty($this->versions)) {
-            $this->getVersionsApi();
-            return $this->versions;
-        }
-        return $this->versions;
+        return $this->getContentApi('versions');
     }
 
     /**
-     * @throws Exception
+     * @param Books $book
+     * @param int $chapter
+     * @param int $verse
+     * @return string[]
      */
     public function getVerse(Books $book = Books::GENESIS, int $chapter = 1, int $verse = 1): array
     {
-        if (!$this->useCache) {
-            return $this->getApi($this->apiUrl . 'verses/' . $this->version . '/' . $book->value . '/' . $chapter . '/' . $verse);
-        }
-
-        foreach ($this->books as $index => $fBook) {
-            if (($index === $book->value) && isset($fBook[$chapter - 1], $fBook[$chapter - 1]['verses'][$verse - 1])) {
-                return $fBook[$chapter - 1]['verses'][$verse - 1];
-            }
-        }
-
-        return ['error' => 'Verse not found'];
-    }
-
-    public function __clone()
-    {
-    }
-
-    public function __wakeup()
-    {
+        return $this->getContentApi('verses/' . $this->version . DIRECTORY_SEPARATOR . $book->value . DIRECTORY_SEPARATOR . $chapter . DIRECTORY_SEPARATOR . $verse);
     }
 }
