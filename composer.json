@@ -24,7 +24,7 @@
         "ergebnis/composer-normalize": "^2",
         "friendsofphp/php-cs-fixer": "^3",
         "phpstan/phpstan": "^1",
-        "phpunit/phpunit": "^9",
+        "phpunit/phpunit": "^9 || ^10",
         "ramsey/conventional-commits": "^1"
     },
     "minimum-stability": "stable",
