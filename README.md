@@ -31,8 +31,8 @@ composer require c0destep/holy_bible
 Para usar Holy Bible, siga o exemplo:
 
 ```php
-use Codestep\HolyBible\Bible;
-use Codestep\HolyBible\Books;
+use HolyBible\Bible;
+use HolyBible\Books;
 
 $bible = new Bible();
 
