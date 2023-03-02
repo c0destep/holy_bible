@@ -11,7 +11,7 @@
 > This library aims to consume the service [ABibliaDigital](https://www.abibliadigital.com.br) provided by
 > [Márcio Sena](https://github.com/marciovsena).
 
-## 💻 Pré-requisitos
+## 💻 Prerequisites
 
 Before you begin, make sure you've met the following requirements:
 
@@ -31,8 +31,8 @@ composer require c0destep/holy_bible
 To use Holy Bible, follow the example:
 
 ```php
-use Codestep\HolyBible\Bible;
-use Codestep\HolyBible\Books;
+use HolyBible\Bible;
+use HolyBible\Books;
 
 $bible = new Bible();
 
