@@ -16,17 +16,17 @@ class Bible
     private const API_URL = 'https://www.abibliadigital.com.br/api/';
 
     /**
-     * @var string
+     * @var string Bible version
      */
     private string $version;
     /**
-     * @var string|null
+     * @var string|null User token provided by API
      */
     private ?string $userToken;
 
     /**
-     * @param string $version Default NVI (Nova Versão Internacional)
-     * @param string|null $userToken
+     * @param string $version Bible version default is "nvi" [optional]
+     * @param string|null $userToken User token provided by API [optional]
      */
     public function __construct(string $version = 'nvi', string $userToken = null)
     {
@@ -35,9 +35,9 @@ class Bible
     }
 
     /**
-     * @param Books $book
-     * @param int $chapter
-     * @return string[]
+     * @param Books $book Bible book
+     * @param int $chapter Book chapter
+     * @return string[] List of all verses of the respective book and chapter
      */
     public function getChapter(Books $book = Books::GENESIS, int $chapter = 1): array
     {
@@ -45,19 +45,18 @@ class Bible
     }
 
     /**
-     * @param string $uri
-     * @return string[]
+     * @param string $uri API route
+     * @return string[] List with data
      */
     public function getContentApi(string $uri): array
     {
         try {
             $client = new Client([
-                'base_url' => self::API_URL,
                 'timeout' => 2.0
             ]);
 
             if (!is_null($this->userToken)) {
-                $response = $client->get($uri, [
+                $response = $client->get(self::API_URL . $uri, [
                     'headers' => [
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
@@ -65,7 +64,7 @@ class Bible
                     ]
                 ]);
             } else {
-                $response = $client->get($uri);
+                $response = $client->get(self::API_URL . $uri);
             }
 
             if ($response->getStatusCode() !== 200) {
@@ -83,7 +82,7 @@ class Bible
     }
 
     /**
-     * @return string
+     * @return string Current bible version
      */
     public function getCurrentVersion(): string
     {
@@ -91,7 +90,7 @@ class Bible
     }
 
     /**
-     * @param string $version
+     * @param string $version Bible version
      * @return Bible
      */
     public function setVersion(string $version): Bible
@@ -101,7 +100,7 @@ class Bible
     }
 
     /**
-     * @return string|null
+     * @return string|null Current user token. NULL if you don't have one.
      */
     public function getUserToken(): ?string
     {
@@ -109,7 +108,7 @@ class Bible
     }
 
     /**
-     * @param string $userToken
+     * @param string $userToken User token
      * @return Bible
      */
     public function setUserToken(string $userToken): Bible
@@ -119,7 +118,7 @@ class Bible
     }
 
     /**
-     * @return string[]
+     * @return string[] List of all books in the bible
      */
     public function getBooks(): array
     {
@@ -127,7 +126,7 @@ class Bible
     }
 
     /**
-     * @return string[]
+     * @return string[] List of all available versions of the Bible
      */
     public function getAvailableVersions(): array
     {
@@ -135,10 +134,10 @@ class Bible
     }
 
     /**
-     * @param Books $book
-     * @param int $chapter
-     * @param int $verse
-     * @return string[]
+     * @param Books $book Bible book
+     * @param int $chapter Book chapter
+     * @param int $verse Chapter verse
+     * @return string[] Verse text
      */
     public function getVerse(Books $book = Books::GENESIS, int $chapter = 1, int $verse = 1): array
     {

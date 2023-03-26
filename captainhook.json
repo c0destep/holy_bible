@@ -34,7 +34,7 @@
                 "conditions": []
             },
             {
-                "action": "./vendor/bin/phpunit --verbose",
+                "action": "./vendor/bin/phpunit",
                 "options": [],
                 "conditions": []
             }
@@ -62,10 +62,6 @@
     },
     "post-change": {
         "enabled": true,
-        "actions": [
-            {
-                "action": "echo 'PHP'"
-            }
-        ]
+        "actions": []
     }
 }

@@ -42,4 +42,4 @@ jobs:
                 run: ./vendor/bin/phpstan analyse src tests
 
             -   name: Run Tests
-                run: ./vendor/bin/phpunit --verbose
+                run: ./vendor/bin/phpunit
