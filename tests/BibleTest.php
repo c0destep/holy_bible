@@ -14,6 +14,6 @@ class BibleTest extends TestCase
 
         $this->assertIsArray($books, 'Error return not array');
 
-        $this->assertArrayHasKey('error', $books, $books['error']);
+        $this->assertArrayNotHasKey('error', $books, 'Error request');
     }
 }
