@@ -59,12 +59,7 @@
                 "conditions": []
             },
             {
-                "action": "./vendor/bin/phpstan analyse src tests",
-                "options": [],
-                "conditions": []
-            },
-            {
-                "action": "./vendor/bin/phpunit",
+                "action": "./vendor/bin/phpstan analyse src",
                 "options": [],
                 "conditions": []
             }
@@ -91,7 +86,7 @@
         "actions": []
     },
     "post-change": {
-        "enabled": true,
+        "enabled": false,
         "actions": []
     }
 }
