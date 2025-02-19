@@ -11,7 +11,37 @@
         "enabled": true,
         "actions": [
             {
-                "action": "\\Ramsey\\CaptainHook\\ValidateConventionalCommit"
+                "action": "\\Ramsey\\CaptainHook\\ValidateConventionalCommit",
+                "config": {
+                    "typeCase": "kebab",
+                    "types": [
+                        "build",
+                        "ci",
+                        "docs",
+                        "feat",
+                        "fix",
+                        "perf",
+                        "refactor",
+                        "style",
+                        "test",
+                        "chore",
+                        "env",
+                        "improvement",
+                        "revert"
+                    ],
+                    "scopeCase": "kebab",
+                    "scopeRequired": false,
+                    "scopes": [
+                        "deps",
+                        "composer",
+                        "captainhook"
+                    ],
+                    "descriptionCase": "lower",
+                    "descriptionEndMark": "",
+                    "bodyRequired": false,
+                    "bodyWrapWidth": 72,
+                    "requiredFooters": []
+                }
             }
         ]
     },
@@ -24,7 +54,7 @@
                 "conditions": []
             },
             {
-                "action": "composer normalize --dry-run --indent-size=4 --indent-style=space",
+                "action": "composer normalize",
                 "options": [],
                 "conditions": []
             },
