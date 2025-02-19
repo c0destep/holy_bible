@@ -23,7 +23,7 @@
         "captainhook/plugin-composer": "^5",
         "ergebnis/composer-normalize": "^2",
         "friendsofphp/php-cs-fixer": "^3",
-        "phpstan/phpstan": "^1",
+        "phpstan/phpstan": "^1 || ^2",
         "phpunit/phpunit": "^10",
         "ramsey/conventional-commits": "^1"
     },
