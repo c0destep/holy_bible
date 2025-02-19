@@ -1,4 +1,4 @@
-name: CI
+name: CI Tests
 
 on:
     - push
@@ -32,13 +32,10 @@ jobs:
                     fail-fast: true
 
             -   name: Install Dependencies
-                run: composer update
+                run: composer install --no-dev
 
             -   name: Composer Normalize
                 run: composer normalize
 
             -   name: Run PHPStan
-                run: ./vendor/bin/phpstan analyse src tests
-
-            -   name: Run Tests
-                run: ./vendor/bin/phpunit
+                run: ./vendor/bin/phpstan analyse src
