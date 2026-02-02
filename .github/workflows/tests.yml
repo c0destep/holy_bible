@@ -32,10 +32,13 @@ jobs:
                     fail-fast: true
 
             -   name: Install Dependencies
-                run: composer install --no-dev
+                run: composer install
 
             -   name: Composer Normalize
-                run: composer normalize
+                run: composer normalize --dry-run
+
+            -   name: Run PHPUnit
+                run: ./vendor/bin/phpunit
 
             -   name: Run PHPStan
-                run: ./vendor/bin/phpstan analyse src
+                run: ./vendor/bin/phpstan analyse src tests
