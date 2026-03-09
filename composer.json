@@ -17,7 +17,7 @@
     "require": {
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7",
-        "psr/log": "^2.0"
+        "monolog/monolog": "^3"
     },
     "require-dev": {
         "captainhook/captainhook": "^5",
@@ -25,7 +25,7 @@
         "ergebnis/composer-normalize": "^2",
         "friendsofphp/php-cs-fixer": "^3",
         "phpstan/phpstan": "^1 || ^2",
-        "phpunit/phpunit": "^10",
+        "phpunit/phpunit": "^13",
         "ramsey/conventional-commits": "^1"
     },
     "minimum-stability": "stable",

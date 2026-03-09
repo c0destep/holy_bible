@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)](https://phpstan.org/)
 
-Uma biblioteca PHP moderna e robusta para acessar a API da Bíblia Digital com suporte a cache, retry logic, logging e DTOs tipados.
+Uma biblioteca PHP moderna e robusta para acessar a API da Bíblia Digital com suporte a cache, retry logic, logging e
+DTOs tipados.
 
 ## ✨ Características
 
@@ -58,11 +59,12 @@ use HolyBible\Bible;
 use HolyBible\Config\BibleConfig;
 use HolyBible\Retry\RetryPolicy;
 use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 
 // Criar logger
 $logger = new Logger('bible');
-$logger->pushHandler(new StreamHandler('bible.log', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('bible.log', Level::Debug));
 
 // Configurar
 $config = new BibleConfig([
@@ -112,20 +114,20 @@ use HolyBible\Exception\{
 
 try {
     $chapter = $bible->getChapter(Books::GENESIS, 1);
-    
+
 } catch (InvalidChapterException $e) {
     // Entrada inválida (capítulo < 1)
     echo "Capítulo inválido: " . $e->getMessage();
-    
+
 } catch (InvalidVerseException $e) {
     // Entrada inválida (versículo < 1)
     echo "Versículo inválido: " . $e->getMessage();
-    
+
 } catch (NetworkException $e) {
     // Erro de rede/timeout
     echo "Erro de conexão: " . $e->getMessage();
     // Retry já foi tentado automaticamente
-    
+
 } catch (ApiResponseException $e) {
     // Erro da API (JSON inválido, etc)
     echo "Erro da API: " . $e->getMessage();
@@ -218,10 +220,11 @@ Suporte completo a PSR-3 logging:
 
 ```php
 use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 
 $logger = new Logger('bible');
-$logger->pushHandler(new StreamHandler('bible.log', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('bible.log', Level::Debug));
 
 $config = new BibleConfig(['logger' => $logger]);
 $bible = Bible::withConfig($config);
@@ -275,6 +278,7 @@ $config = new BibleConfig(['cache_enabled' => false]);
 ## 📚 DTOs Disponíveis
 
 ### BookDTO
+
 ```php
 $book->name;       // "Gênesis"
 $book->abbrev;     // "gn"
@@ -283,6 +287,7 @@ $book->testament;  // "VT"
 ```
 
 ### ChapterDTO
+
 ```php
 $chapter->book;           // BookDTO
 $chapter->number;         // 3
@@ -292,12 +297,14 @@ $chapter->getVerseCount(); // int
 ```
 
 ### VerseDTO
+
 ```php
 $verse->number;  // 16
 $verse->text;    // "Porque Deus amou o mundo..."
 ```
 
 ### VersionDTO
+
 ```php
 $version->version;  // "nvi"
 $version->name;     // "Nova Versão Internacional"
