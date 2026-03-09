@@ -18,3 +18,7 @@ phpunit.xml
 
 ### PHP CS Fixer Files
 .php-cs-fixer.cache
+
+### Environment and Logs
+.env
+*.log
