@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace HolyBible\Cache;
 
@@ -21,8 +22,52 @@ class FileCache implements CacheInterface
         $this->cacheDir = $cacheDir;
 
         if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0755, true);
+            if (!@mkdir($this->cacheDir, 0755, true) && !is_dir($this->cacheDir)) {
+                // Silently fallback to NullCache logic would be better if we could,
+                // but FileCache must at least try to be valid.
+                // For now, let's ensure we don't crash but maybe we should throw or log.
+            }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set(string $key, mixed $value, int $ttl = 3600): bool
+    {
+        if (!is_writable($this->cacheDir) && !is_dir($this->cacheDir)) {
+            return false;
+        }
+
+        $file = $this->getFilePath($key);
+        $data = [
+            'expires' => time() + $ttl,
+            'value'   => $value
+        ];
+
+        $result = @file_put_contents($file, serialize($data), LOCK_EX);
+        return $result !== false;
+    }
+
+    /**
+     * Get file path for cache key
+     *
+     * @param string $key Cache key
+     *
+     * @return string File path
+     */
+    private function getFilePath(string $key): string
+    {
+        $hash = md5($key);
+        return $this->cacheDir . DIRECTORY_SEPARATOR . $hash . '.cache';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function has(string $key): bool
+    {
+        return $this->get($key) !== null;
     }
 
     /**
@@ -32,16 +77,17 @@ class FileCache implements CacheInterface
     {
         $file = $this->getFilePath($key);
 
-        if (!file_exists($file)) {
+        if (!@file_exists($file)) {
             return null;
         }
 
-        $content = file_get_contents($file);
+        $content = @file_get_contents($file);
         if ($content === false) {
             return null;
         }
 
-        $data = unserialize($content);
+        /** @noinspection UnserializeExploitsInspection */
+        $data = @unserialize($content);
 
         if (!is_array($data) || !isset($data['expires'], $data['value'])) {
             return null;
@@ -58,38 +104,15 @@ class FileCache implements CacheInterface
     /**
      * @inheritDoc
      */
-    public function set(string $key, mixed $value, int $ttl = 3600): bool
-    {
-        $file = $this->getFilePath($key);
-        $data = [
-            'expires' => time() + $ttl,
-            'value' => $value
-        ];
-
-        $result = file_put_contents($file, serialize($data), LOCK_EX);
-        return $result !== false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function has(string $key): bool
-    {
-        return $this->get($key) !== null;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function delete(string $key): bool
     {
         $file = $this->getFilePath($key);
 
-        if (!file_exists($file)) {
+        if (!@file_exists($file)) {
             return true;
         }
 
-        return unlink($file);
+        return @unlink($file);
     }
 
     /**
@@ -106,26 +129,16 @@ class FileCache implements CacheInterface
             return false;
         }
 
+        $success = true;
         foreach ($files as $file) {
             if (is_file($file)) {
-                unlink($file);
+                if (!@unlink($file)) {
+                    $success = false;
+                }
             }
         }
 
-        return true;
-    }
-
-    /**
-     * Get file path for cache key
-     *
-     * @param string $key Cache key
-     *
-     * @return string File path
-     */
-    private function getFilePath(string $key): string
-    {
-        $hash = md5($key);
-        return $this->cacheDir . DIRECTORY_SEPARATOR . $hash . '.cache';
+        return $success;
     }
 
     /**

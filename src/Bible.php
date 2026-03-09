@@ -1,19 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace HolyBible;
 
 use HolyBible\Client\GuzzleBibleClient;
 use HolyBible\Config\BibleConfig;
+use HolyBible\Exception\ApiResponseException;
 use HolyBible\Exception\InvalidChapterException;
 use HolyBible\Exception\InvalidVerseException;
 use HolyBible\Exception\NetworkException;
-use HolyBible\Exception\ApiResponseException;
 use HolyBible\Service\BibleService;
 
 /**
  * Bible API Facade
- * 
+ *
  * This class maintains backward compatibility while delegating to the new service layer
  */
 class Bible
@@ -29,11 +30,11 @@ class Bible
     public function __construct(string $version = 'nvi', ?string $userToken = null, float $timeout = 5.0)
     {
         $this->config = new BibleConfig([
-            'version' => $version,
-            'user_token' => $userToken,
-            'timeout' => $timeout,
+            'version'       => $version,
+            'user_token'    => $userToken,
+            'timeout'       => $timeout,
             'cache_enabled' => true,
-            'cache_ttl' => 3600
+            'cache_ttl'     => 3600
         ]);
 
         $client = new GuzzleBibleClient($timeout, $this->config->getApiUrl());
@@ -61,6 +62,16 @@ class Bible
         $instance->service = new BibleService($client, $config);
 
         return $instance;
+    }
+
+    /**
+     * Get request timeout
+     *
+     * @return float Timeout in seconds
+     */
+    public function getTimeout(): float
+    {
+        return $this->config->getTimeout();
     }
 
     /**
@@ -173,16 +184,6 @@ class Bible
     }
 
     /**
-     * Get request timeout
-     *
-     * @return float Timeout in seconds
-     */
-    public function getTimeout(): float
-    {
-        return $this->config->getTimeout();
-    }
-
-    /**
      * Set request timeout
      *
      * @param float $timeout Timeout in seconds
@@ -193,6 +194,16 @@ class Bible
     {
         $this->config->setTimeout($timeout);
         return $this;
+    }
+
+    /**
+     * Clear cache
+     *
+     * @return bool
+     */
+    public function clearCache(): bool
+    {
+        return $this->config->getCache()->clear();
     }
 
     /**

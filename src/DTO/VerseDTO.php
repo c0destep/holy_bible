@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace HolyBible\DTO;
 
@@ -44,7 +45,17 @@ class VerseDTO
     {
         return [
             'number' => $this->number,
-            'text' => $this->text
+            'text'   => $this->text
         ];
+    }
+
+    /**
+     * Convert to string
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->text;
     }
 }

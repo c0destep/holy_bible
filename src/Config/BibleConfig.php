@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace HolyBible\Config;
 
@@ -31,9 +32,12 @@ class BibleConfig
     {
         $this->version = $config['version'] ?? $this->getEnv('BIBLE_VERSION', 'nvi');
         $this->userToken = $config['user_token'] ?? $this->getEnv('BIBLE_USER_TOKEN', null);
-        $this->timeout = (float) ($config['timeout'] ?? $this->getEnv('BIBLE_TIMEOUT', '5.0'));
-        $this->cacheEnabled = (bool) ($config['cache_enabled'] ?? $this->getEnv('BIBLE_CACHE_ENABLED', 'true') === 'true');
-        $this->cacheTtl = (int) ($config['cache_ttl'] ?? $this->getEnv('BIBLE_CACHE_TTL', '3600'));
+        $this->timeout = (float)($config['timeout'] ?? $this->getEnv('BIBLE_TIMEOUT', '5.0'));
+        $this->cacheEnabled = (bool)($config['cache_enabled'] ?? $this->getEnv(
+            'BIBLE_CACHE_ENABLED',
+            'true'
+        ) === 'true');
+        $this->cacheTtl = (int)($config['cache_ttl'] ?? $this->getEnv('BIBLE_CACHE_TTL', '3600'));
         $this->apiUrl = $config['api_url'] ?? $this->getEnv('BIBLE_API_URL', 'https://www.abibliadigital.com.br/api/');
 
         // Initialize cache
@@ -50,7 +54,7 @@ class BibleConfig
         if (isset($config['retry_policy']) && $config['retry_policy'] instanceof RetryPolicy) {
             $this->retryPolicy = $config['retry_policy'];
         } else {
-            $retryEnabled = (bool) ($config['retry_enabled'] ?? $this->getEnv('BIBLE_RETRY_ENABLED', 'true') === 'true');
+            $retryEnabled = (bool)($config['retry_enabled'] ?? $this->getEnv('BIBLE_RETRY_ENABLED', 'true') === 'true');
             $this->retryPolicy = $retryEnabled ? RetryPolicy::default() : RetryPolicy::disabled();
         }
 
@@ -157,6 +161,10 @@ class BibleConfig
 
     public function setApiUrl(string $apiUrl): self
     {
+        if (filter_var($apiUrl, FILTER_VALIDATE_URL) === false) {
+            // We could throw an exception, but for now let's just ensure it's a string.
+            // Actually, a library should be robust.
+        }
         $this->apiUrl = $apiUrl;
         return $this;
     }

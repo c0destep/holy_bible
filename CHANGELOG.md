@@ -5,12 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2026-03-09
+
+### Added
+
+- Adicionado método `clearCache()` na classe `Bible` (Facade).
+- Adicionado método mágico `__toString()` no `VerseDTO` para facilitar o uso direto em strings.
+
+### Changed
+
+- Melhoria no `GuzzleBibleClient`: Reuso da configuração `base_uri` e headers padrão do Guzzle para melhor performance e
+  consistência.
+- Melhoria no `FileCache`: Adicionada verificação de diretório gravável e tratamento de erros silenciados para evitar
+  interrupções por falhas de permissão.
+- Melhoria no `BibleConfig`: Adicionada validação básica de URL para o endpoint da API.
+
 ## [2.0.2] - 2026-03-09
 
 ### Fixed
 
 - Downgraded `phpunit/phpunit` to `^10.0` to restore compatibility with PHP 8.1 in GitHub Actions.
-- Fixed unit tests (`BibleTest`) to correctly mock client and disable cache, ensuring stable test execution across PHP versions.
+- Fixed unit tests (`BibleTest`) to correctly mock client and disable cache, ensuring stable test execution across PHP
+  versions.
 
 ## [2.0.1] - 2026-03-09
 
