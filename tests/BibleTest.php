@@ -4,12 +4,15 @@ namespace Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use HolyBible\Bible;
 use HolyBible\Books;
+use HolyBible\Cache\NullCache;
+use HolyBible\Client\BibleClientInterface;
 use HolyBible\Exception\ApiResponseException;
 use HolyBible\Exception\InvalidChapterException;
 use HolyBible\Exception\InvalidVerseException;
@@ -19,49 +22,6 @@ use ReflectionClass;
 
 class BibleTest extends TestCase
 {
-    /**
-     * Helper method to inject a mocked Guzzle client into Bible instance
-     */
-    private function injectMockClient(Bible $bible, Client $mockClient): void
-    {
-        $service = $bible->getService();
-        $reflection = new ReflectionClass($service);
-        $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
-
-        // Create a mock BibleClientInterface that wraps the Guzzle mock
-        $mockBibleClient = $this->createMock(\HolyBible\Client\BibleClientInterface::class);
-        $mockBibleClient->method('get')->willReturnCallback(function ($uri) use ($mockClient) {
-            try {
-                $response = $mockClient->get('https://www.abibliadigital.com.br/api/' . $uri);
-                $content = $response->getBody()->getContents();
-
-                if ($response->getStatusCode() !== 200) {
-                    throw new \HolyBible\Exception\ApiResponseException(
-                        'API returned status code ' . $response->getStatusCode()
-                    );
-                }
-
-                $data = json_decode($content, true);
-                if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \HolyBible\Exception\ApiResponseException(
-                        'Failed to decode JSON response'
-                    );
-                }
-
-                return $data ?? [];
-            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-                throw new \HolyBible\Exception\NetworkException(
-                    'Network error: ' . $e->getMessage(),
-                    $e->getCode(),
-                    $e
-                );
-            }
-        });
-
-        $property->setValue($service, $mockBibleClient);
-    }
-
     public function testGetBooksSuccess(): void
     {
         $mockResponse = [
@@ -89,12 +49,79 @@ class BibleTest extends TestCase
         $this->assertEquals('Gênesis', $books[0]['name']);
     }
 
+    /**
+     * Helper method to inject a mocked Guzzle client into Bible instance
+     */
+    private function injectMockClient(Bible $bible, Client $mockClient): void
+    {
+        $reflection = new ReflectionClass($bible);
+        $serviceProperty = $reflection->getProperty('service');
+        $serviceProperty->setAccessible(true);
+        $service = $serviceProperty->getValue($bible);
+
+        $reflectionService = new ReflectionClass($service);
+        $clientProperty = $reflectionService->getProperty('client');
+        $clientProperty->setAccessible(true);
+
+        $cacheProperty = $reflectionService->getProperty('cache');
+        $cacheProperty->setAccessible(true);
+        $cacheProperty->setValue($service, new NullCache());
+
+        // Create a mock BibleClientInterface that wraps the Guzzle mock
+        $mockBibleClient = $this->createMock(BibleClientInterface::class);
+        $mockBibleClient->method('get')->willReturnCallback(function ($uri) use ($mockClient) {
+            try {
+                $response = $mockClient->get('https://www.abibliadigital.com.br/api/' . $uri);
+                $content = $response->getBody()->getContents();
+
+                if ($response->getStatusCode() !== 200) {
+                    throw new NetworkException(
+                        'Network error: API returned status code ' . $response->getStatusCode()
+                    );
+                }
+
+                $data = json_decode($content, true);
+                if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+                    throw new ApiResponseException(
+                        'Failed to decode JSON response'
+                    );
+                }
+
+                return $data ?? [];
+            } catch (ConnectException $e) {
+                throw new NetworkException(
+                    'Network error: ' . $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                );
+            } catch (GuzzleException $e) {
+                // If it's a RequestException with a response, we can get the status code
+                $statusCode = method_exists($e, 'getResponse') && $e->getResponse() ? $e->getResponse()->getStatusCode(
+                ) : 0;
+
+                if ($statusCode > 0 && $statusCode !== 200) {
+                    throw new NetworkException(
+                        'Network error: API returned status code ' . $statusCode
+                    );
+                }
+
+                throw new NetworkException(
+                    'Network error: ' . $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        });
+
+        $clientProperty->setValue($service, $mockBibleClient);
+    }
+
     public function testGetChapterSuccess(): void
     {
         $mockResponse = [
-            'book' => ['name' => 'Gênesis'],
+            'book'    => ['name' => 'Gênesis'],
             'chapter' => ['number' => 1],
-            'verses' => [
+            'verses'  => [
                 ['number' => 1, 'text' => 'No princípio...']
             ]
         ];
@@ -122,10 +149,10 @@ class BibleTest extends TestCase
     public function testGetVerseSuccess(): void
     {
         $mockResponse = [
-            'book' => ['name' => 'João'],
+            'book'    => ['name' => 'João'],
             'chapter' => 3,
-            'number' => 16,
-            'text' => 'Porque Deus amou o mundo...'
+            'number'  => 16,
+            'text'    => 'Porque Deus amou o mundo...'
         ];
 
         $mock = new MockHandler([
