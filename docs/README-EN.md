@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)](https://phpstan.org/)
 
-A modern and robust PHP library to access the Digital Bible API with support for caching, retry logic, logging, and typed DTOs.
+A modern and robust PHP library to access the Digital Bible API with support for caching, retry logic, logging, and
+typed DTOs.
 
 ## ✨ Features
 
@@ -14,9 +15,10 @@ A modern and robust PHP library to access the Digital Bible API with support for
 - 🎯 **Type-Safe** - DTOs with readonly properties (PHP 8.1+)
 - 🏗️ **Layered Architecture** - Client/Service/Facade
 - ⚙️ **Flexible Configuration** - Arrays, environment variables, or objects
-- ✅ **100% Tested** - 17 unit tests with mocks
+- ✅ **100% Tested** - 27 automated tests
 - 🔒 **PHPStan Level 8** - Rigorous static analysis
 - 🔙 **Backward Compatible** - Works with existing code
+- 📴 **Offline Support** - Local SQLite support
 
 ## 📦 Installation
 
@@ -58,11 +60,12 @@ use HolyBible\Bible;
 use HolyBible\Config\BibleConfig;
 use HolyBible\Retry\RetryPolicy;
 use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 
 // Create logger
 $logger = new Logger('bible');
-$logger->pushHandler(new StreamHandler('bible.log', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('bible.log', Level::Debug));
 
 // Configure
 $config = new BibleConfig([
@@ -112,20 +115,20 @@ use HolyBible\Exception\{
 
 try {
     $chapter = $bible->getChapter(Books::GENESIS, 1);
-    
+
 } catch (InvalidChapterException $e) {
     // Invalid input (chapter < 1)
     echo "Invalid chapter: " . $e->getMessage();
-    
+
 } catch (InvalidVerseException $e) {
     // Invalid input (verse < 1)
     echo "Invalid verse: " . $e->getMessage();
-    
+
 } catch (NetworkException $e) {
     // Network error/timeout
     echo "Connection error: " . $e->getMessage();
     // Retry was already attempted automatically
-    
+
 } catch (ApiResponseException $e) {
     // API Error (Invalid JSON, etc)
     echo "API Error: " . $e->getMessage();
@@ -159,6 +162,7 @@ export BIBLE_TIMEOUT=10.0
 export BIBLE_CACHE_ENABLED=true
 export BIBLE_CACHE_TTL=7200
 export BIBLE_RETRY_ENABLED=true
+export BIBLE_SQLITE_PATH=/path/to/bible.sqlite
 ```
 
 ```php
@@ -218,10 +222,11 @@ Full support for PSR-3 logging:
 
 ```php
 use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Handler\StreamHandler;
 
 $logger = new Logger('bible');
-$logger->pushHandler(new StreamHandler('bible.log', Logger::DEBUG));
+$logger->pushHandler(new StreamHandler('bible.log', Level::Debug));
 
 $config = new BibleConfig(['logger' => $logger]);
 $bible = Bible::withConfig($config);
@@ -272,9 +277,44 @@ $config = new BibleConfig(['cache' => new RedisCache()]);
 $config = new BibleConfig(['cache_enabled' => false]);
 ```
 
+## 💾 Offline Support (SQLite)
+
+Now you can use the library without internet connection through a local SQLite database.
+
+### ⚙️ SQLite Configuration
+
+```php
+use HolyBible\Bible;
+use HolyBible\Config\BibleConfig;
+
+// 1. Configure the path to the .sqlite file
+$config = new BibleConfig([
+    'sqlite_path' => 'bible.sqlite',
+    'version'     => 'nvi'
+]);
+
+// 2. The Bible facade will automatically switch to offline mode
+$bible = Bible::withConfig($config);
+
+// 3. Usage remains identical to online mode (URIs mapped to SQL)
+$chapter = $bible->getChapter(HolyBible\Books::PSALMS, 23);
+```
+
+### 🌍 Environment Variable
+
+You can also configure the path globally via `.env` or export:
+
+```bash
+export BIBLE_SQLITE_PATH=/path/to/bible.sqlite
+```
+
+The library includes the `bible.sqlite` file in the root, generated from the provided `data.sql`, allowing immediate
+offline functionality.
+
 ## 📚 Available DTOs
 
 ### BookDTO
+
 ```php
 $book->name;       // "Genesis"
 $book->abbrev;     // "gn"
@@ -283,6 +323,7 @@ $book->testament;  // "VT"
 ```
 
 ### ChapterDTO
+
 ```php
 $chapter->book;           // BookDTO
 $chapter->number;         // 3
@@ -292,12 +333,14 @@ $chapter->getVerseCount(); // int
 ```
 
 ### VerseDTO
+
 ```php
 $verse->number;  // 16
 $verse->text;    // "For God so loved the world..."
 ```
 
 ### VersionDTO
+
 ```php
 $version->version;  // "nvi"
 $version->name;     // "New International Version"
@@ -318,11 +361,11 @@ $version->name;     // "New International Version"
 
 ## 📊 Statistics
 
-- **17 unit tests** (100% passing)
-- **46 assertions**
+- **27 automated tests** (100% passing)
+- **71 assertions**
 - **PHPStan level 8** (0 errors)
-- **~1,900 lines of code**
-- **18 classes**
+- **~2,200 lines of code**
+- **19 classes**
 - **2 interfaces**
 - **5 custom exceptions**
 
