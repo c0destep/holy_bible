@@ -1,5 +1,7 @@
 # Holy Bible API - PHP Library
 
+> 🌐 [English Version](docs/README-EN.md)
+
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)](https://phpstan.org/)
