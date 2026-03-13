@@ -17,7 +17,7 @@ DTOs tipados.
 - 🎯 **Type-Safe** - DTOs com propriedades readonly (PHP 8.1+)
 - 🏗️ **Arquitetura em Camadas** - Client/Service/Facade
 - ⚙️ **Configuração Flexível** - Arrays, variáveis de ambiente, ou objetos
-- ✅ **100% Testado** - 27 testes unitários com mocks
+- ✅ **100% Testado** - 27 testes automatizados
 - 🔒 **PHPStan Level 8** - Análise estática rigorosa
 - 🔙 **Backward Compatible** - Funciona com código existente
 - 📴 **Offline Support** - Suporte a SQLite local
@@ -353,6 +353,12 @@ $version->name;     // "Nova Versão Internacional"
 ```bash
 # Rodar todos os testes
 ./vendor/bin/phpunit
+
+# Com coverage
+./vendor/bin/phpunit --coverage-html coverage
+
+# PHPStan
+./vendor/bin/phpstan analyse src tests
 ```
 
 ## 📊 Estatísticas

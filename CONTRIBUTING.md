@@ -47,6 +47,12 @@ Antes de realizar o commit, recomendamos executar as seguintes ferramentas manua
 Note que os hooks de **pre-commit** do CaptainHook executarão automaticamente o **linting**, a **normalização do
 composer.json** e a **análise estática** do PHPStan em cada commit.
 
+## Documentação
+
+- Mantenha a paridade entre o `README.md` (português) e o `docs/README-EN.md` (inglês).
+- Qualquer alteração na documentação principal deve ser refletida na versão em inglês.
+- Utilize o padrão **Conventional Commits** para as mensagens de commit (sempre em Inglês).
+
 ## Padrões de Commit
 
 Seguimos o padrão **Conventional Commits**. As mensagens de commit devem ser claras e objetivas. Os tipos permitidos
