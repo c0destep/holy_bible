@@ -41,7 +41,7 @@ class SQLiteBibleClient implements BibleClientInterface
             default => throw new ApiResponseException("Unknown endpoint: $endpoint"),
         };
 
-        /** @var array<string, mixed> $data */
+        /** @var array<mixed> $data */
         return $data;
     }
 

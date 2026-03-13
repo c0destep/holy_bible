@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace HolyBible\Client;
 
@@ -15,7 +16,7 @@ interface BibleClientInterface
      *
      * @param string $uri API endpoint URI
      *
-     * @return array<string, mixed> Response data
+     * @return array<mixed> Response data
      * @throws NetworkException If network error occurs
      * @throws ApiResponseException If API returns unexpected response
      */

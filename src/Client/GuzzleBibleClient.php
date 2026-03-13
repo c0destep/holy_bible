@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace HolyBible\Client;
@@ -95,7 +96,7 @@ class GuzzleBibleClient implements BibleClientInterface
                     'attempt' => $attempt + 1
                 ]);
 
-                /** @var array<string, mixed> */
+                /** @var array<mixed> */
                 $result = $data ?? [];
                 return $result;
             } catch (ConnectException $e) {
