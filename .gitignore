@@ -22,3 +22,4 @@ phpunit.xml
 ### Environment and Logs
 .env
 *.log
+data.sql
