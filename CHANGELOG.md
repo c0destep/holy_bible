@@ -28,6 +28,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   compatibilidade total com PHP 8.1+.
 - **Configuração**: Migrado o arquivo `phpunit.xml.dist` para o esquema mais recente do PHPUnit 10.
 
+### Fixed
+
+- **Análise Estática**: Corrigidos erros de tipos no PHPStan (`BibleClientInterface`) para suportar retornos de listas
+  com chaves inteiras.
+
+### Documentation
+
+- **Paridade**: Garantida a paridade completa entre o `README.md` principal e a versão em inglês (`docs/README-EN.md`).
+- **Navegação**: Adicionadas âncoras de alternância de idioma nos arquivos de documentação.
+- **Diretrizes**: Atualizado o `CONTRIBUTING.md` com regras para manutenção da documentação bilíngue e padronização de
+  commits em inglês.
+
 ## [2.0.5] - 2026-03-09
 
 ### Added
