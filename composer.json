@@ -16,6 +16,7 @@
     },
     "require": {
         "php": "^8.1",
+        "ext-pdo": "*",
         "guzzlehttp/guzzle": "^7",
         "monolog/monolog": "^3"
     },
@@ -27,6 +28,9 @@
         "phpstan/phpstan": "^1 || ^2",
         "phpunit/phpunit": "^10.0",
         "ramsey/conventional-commits": "^1"
+    },
+    "suggest": {
+        "ext-pdo_sqlite": "Required for using the offline SQLite functionality"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

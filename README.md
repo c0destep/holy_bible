@@ -15,9 +15,10 @@ DTOs tipados.
 - 🎯 **Type-Safe** - DTOs com propriedades readonly (PHP 8.1+)
 - 🏗️ **Arquitetura em Camadas** - Client/Service/Facade
 - ⚙️ **Configuração Flexível** - Arrays, variáveis de ambiente, ou objetos
-- ✅ **100% Testado** - 17 testes unitários com mocks
+- ✅ **100% Testado** - 27 testes unitários com mocks
 - 🔒 **PHPStan Level 8** - Análise estática rigorosa
 - 🔙 **Backward Compatible** - Funciona com código existente
+- 📴 **Offline Support** - Suporte a SQLite local
 
 ## 📦 Instalação
 
@@ -161,6 +162,7 @@ export BIBLE_TIMEOUT=10.0
 export BIBLE_CACHE_ENABLED=true
 export BIBLE_CACHE_TTL=7200
 export BIBLE_RETRY_ENABLED=true
+export BIBLE_SQLITE_PATH=/caminho/para/bible.sqlite
 ```
 
 ```php
@@ -275,6 +277,40 @@ $config = new BibleConfig(['cache' => new RedisCache()]);
 $config = new BibleConfig(['cache_enabled' => false]);
 ```
 
+## 💾 Suporte Offline (SQLite)
+
+Agora você pode usar a biblioteca sem conexão com a internet através de um banco de dados SQLite local.
+
+### ⚙️ Configuração SQLite
+
+```php
+use HolyBible\Bible;
+use HolyBible\Config\BibleConfig;
+
+// 1. Configure o caminho para o arquivo .sqlite
+$config = new BibleConfig([
+    'sqlite_path' => 'bible.sqlite',
+    'version'     => 'nvi'
+]);
+
+// 2. A fachada Bible trocará automaticamente para o modo offline
+$bible = Bible::withConfig($config);
+
+// 3. O uso permanece idêntico ao modo online (URIs mapeadas para SQL)
+$chapter = $bible->getChapter(HolyBible\Books::PSALMS, 23);
+```
+
+### 🌍 Variável de Ambiente
+
+Você também pode configurar o caminho globalmente via `.env` ou export:
+
+```bash
+export BIBLE_SQLITE_PATH=/caminho/para/bible.sqlite
+```
+
+A biblioteca inclui o arquivo `bible.sqlite` na raiz, gerado a partir do `data.sql` fornecido, permitindo o
+funcionamento offline imediato.
+
 ## 📚 DTOs Disponíveis
 
 ### BookDTO
@@ -315,21 +351,15 @@ $version->name;     // "Nova Versão Internacional"
 ```bash
 # Rodar todos os testes
 ./vendor/bin/phpunit
-
-# Com cobertura
-./vendor/bin/phpunit --coverage-html coverage
-
-# PHPStan
-./vendor/bin/phpstan analyse src tests
 ```
 
 ## 📊 Estatísticas
 
-- **17 testes unitários** (100% passando)
-- **46 assertions**
+- **27 testes automatizados** (100% passando)
+- **71 assertions**
 - **PHPStan level 8** (0 erros)
-- **~1,900 linhas de código**
-- **18 classes**
+- **~2,200 linhas de código**
+- **19 classes**
 - **2 interfaces**
 - **5 exceções customizadas**
 

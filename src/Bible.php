@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HolyBible;
 
 use HolyBible\Client\GuzzleBibleClient;
+use HolyBible\Client\SQLiteBibleClient;
 use HolyBible\Config\BibleConfig;
 use HolyBible\Exception\ApiResponseException;
 use HolyBible\Exception\InvalidChapterException;
@@ -37,7 +38,9 @@ class Bible
             'cache_ttl'     => 3600
         ]);
 
-        $client = new GuzzleBibleClient($timeout, $this->config->getApiUrl());
+        $client = $this->config->getSqlitePath()
+            ? new SQLiteBibleClient($this->config->getSqlitePath())
+            : new GuzzleBibleClient($timeout, $this->config->getApiUrl());
         $this->service = new BibleService($client, $this->config);
     }
 
@@ -53,12 +56,14 @@ class Bible
         $instance = new self();
         $instance->config = $config;
 
-        $client = new GuzzleBibleClient(
-            $config->getTimeout(),
-            $config->getApiUrl(),
-            $config->getRetryPolicy(),
-            $config->getLogger()
-        );
+        $client = $config->getSqlitePath()
+            ? new SQLiteBibleClient($config->getSqlitePath())
+            : new GuzzleBibleClient(
+                $config->getTimeout(),
+                $config->getApiUrl(),
+                $config->getRetryPolicy(),
+                $config->getLogger()
+            );
         $instance->service = new BibleService($client, $config);
 
         return $instance;

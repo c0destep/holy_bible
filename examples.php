@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 require_once 'vendor/autoload.php';
 
 use HolyBible\Bible;
 use HolyBible\Books;
 use HolyBible\Config\BibleConfig;
+use HolyBible\Exception\InvalidChapterException;
 
 echo "=== Holy Bible API - Examples ===\n\n";
 
@@ -21,10 +24,10 @@ try {
 // Example 2: With custom configuration
 echo "\n2. With Configuration:\n";
 $config = new BibleConfig([
-    'version' => 'nvi',
-    'timeout' => 10.0,
+    'version'       => 'nvi',
+    'timeout'       => 10.0,
     'cache_enabled' => true,
-    'cache_ttl' => 7200  // 2 hours
+    'cache_ttl'     => 7200  // 2 hours
 ]);
 $bible2 = Bible::withConfig($config);
 echo "   ✓ Created Bible with custom config\n";
@@ -50,7 +53,7 @@ try {
 echo "\n4. Error Handling:\n";
 try {
     $bible->getChapter(Books::GENESIS, -1);
-} catch (\HolyBible\Exception\InvalidChapterException $e) {
+} catch (InvalidChapterException $e) {
     echo "   ✓ Caught InvalidChapterException: " . $e->getMessage() . "\n";
 }
 
@@ -78,5 +81,23 @@ $time2 = (microtime(true) - $start) * 1000;
 echo "   ✓ First call: " . number_format($time1, 2) . "ms\n";
 echo "   ✓ Cached call: " . number_format($time2, 2) . "ms\n";
 echo "   ✓ Speed improvement: " . number_format($time1 / $time2, 1) . "x faster\n";
+
+// Example 7: Offline usage with SQLite
+echo "\n7. Offline Usage (SQLite):\n";
+if (file_exists('bible.sqlite')) {
+    $config3 = new BibleConfig([
+        'sqlite_path' => 'bible.sqlite',
+        'version'     => 'nvi'
+    ]);
+    $bible5 = Bible::withConfig($config3);
+    try {
+        $verse = $bible5->getVerse(Books::PSALMS, 23, 1);
+        echo "   ✓ Got Psalm 23:1 from SQLite: \"{$verse['text']}\"\n";
+    } catch (Exception $e) {
+        echo "   ✗ Error reading from SQLite: " . $e->getMessage() . "\n";
+    }
+} else {
+    echo "   ! Skip: bible.sqlite not found in project root\n";
+}
 
 echo "\n=== All examples completed ===\n";

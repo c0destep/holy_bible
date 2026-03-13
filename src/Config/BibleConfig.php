@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace HolyBible\Config;
@@ -22,6 +23,7 @@ class BibleConfig
     private int $cacheTtl;
     private CacheInterface $cache;
     private string $apiUrl;
+    private ?string $sqlitePath;
     private RetryPolicy $retryPolicy;
     private LoggerInterface $logger;
 
@@ -39,6 +41,7 @@ class BibleConfig
         ) === 'true');
         $this->cacheTtl = (int)($config['cache_ttl'] ?? $this->getEnv('BIBLE_CACHE_TTL', '3600'));
         $this->apiUrl = $config['api_url'] ?? $this->getEnv('BIBLE_API_URL', 'https://www.abibliadigital.com.br/api/');
+        $this->sqlitePath = $config['sqlite_path'] ?? $this->getEnv('BIBLE_SQLITE_PATH', null);
 
         // Initialize cache
         if (isset($config['cache']) && $config['cache'] instanceof CacheInterface) {
@@ -166,6 +169,17 @@ class BibleConfig
             // Actually, a library should be robust.
         }
         $this->apiUrl = $apiUrl;
+        return $this;
+    }
+
+    public function getSqlitePath(): ?string
+    {
+        return $this->sqlitePath;
+    }
+
+    public function setSqlitePath(?string $sqlitePath): self
+    {
+        $this->sqlitePath = $sqlitePath;
         return $this;
     }
 

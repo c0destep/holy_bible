@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-03-13
+
+### Added
+
+- **Suporte Offline com SQLite**: Nova funcionalidade que permite o uso da biblioteca sem conexão com a internet através
+  de um
+  banco de dados SQLite local.
+- **SQLiteBibleClient**: Novo cliente que traduz as requisições da URI da API para consultas SQL correspondentes.
+- `BibleConfig`: Adicionado parâmetro `sqlite_path` (ou variável de ambiente `BIBLE_SQLITE_PATH`) para configurar o
+  caminho
+  do banco de dados SQLite.
+- **Banco de Dados**: Gerado o arquivo `bible.sqlite` pronto para uso offline a partir do arquivo `data.sql` fornecido.
+
+### Changed
+
+- `Bible` (Facade): Agora alterna automaticamente para o modo SQLite se o `sqlite_path` estiver configurado.
+- **Testes Automatizados**: Adicionada cobertura completa para o cliente SQLite e testes de integração com banco em
+  memória
+  e em disco.
+- **Manutenção**: Limpeza do projeto com a remoção de arquivos residuais e correção de deprecations nos testes para
+  compatibilidade total com PHP 8.1+.
+- **Configuração**: Migrado o arquivo `phpunit.xml.dist` para o esquema mais recente do PHPUnit 10.
+
 ## [2.0.5] - 2026-03-09
 
 ### Added

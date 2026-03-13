@@ -56,15 +56,12 @@ class BibleTest extends TestCase
     {
         $reflection = new ReflectionClass($bible);
         $serviceProperty = $reflection->getProperty('service');
-        $serviceProperty->setAccessible(true);
         $service = $serviceProperty->getValue($bible);
 
         $reflectionService = new ReflectionClass($service);
         $clientProperty = $reflectionService->getProperty('client');
-        $clientProperty->setAccessible(true);
 
         $cacheProperty = $reflectionService->getProperty('cache');
-        $cacheProperty->setAccessible(true);
         $cacheProperty->setValue($service, new NullCache());
 
         // Create a mock BibleClientInterface that wraps the Guzzle mock
