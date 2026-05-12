@@ -23,7 +23,7 @@ jobs:
                 uses: actions/checkout@main
 
             -   name: Install PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@v2.37
                 with:
                     php-version: ${{ matrix.php-version }}
                     extensions: php-curl
