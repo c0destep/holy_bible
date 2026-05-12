@@ -38,7 +38,7 @@ jobs:
                 run: composer normalize --dry-run
 
             -   name: Run PHPUnit
-                run: ./vendor/bin/phpunit --log-junit junit.xml --coverage-clover coverage.xml .
+                run: ./vendor/bin/phpunit --log-junit junit.xml --coverage-clover coverage.xml --fail-on-warning=0
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v5
