@@ -5,6 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%208-brightgreen.svg)](https://phpstan.org/)
+[![codecov](https://codecov.io/github/c0destep/holy_bible/graph/badge.svg?token=TNEY44UM1S)](https://codecov.io/github/c0destep/holy_bible)
 
 Uma biblioteca PHP moderna e robusta para acessar a API da Bíblia Digital com suporte a cache, retry logic, logging e
 DTOs tipados.
